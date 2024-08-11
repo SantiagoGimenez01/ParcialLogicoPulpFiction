@@ -68,6 +68,7 @@ encargo(marsellus, vincent, buscar(butch, losAngeles)).
 estaEnProblemas(butch).
 estaEnProblemas(Personaje):-
     trabajaPara(Jefe, Personaje),
+    esPeligroso(Jefe),
     pareja(Jefe, Pareja),
     encargo(Jefe, Personaje, cuidar(Pareja)).
 estaEnProblemas(Personaje):-
@@ -105,18 +106,30 @@ cantidadDeEncargos(Personaje, Cantidad):-
 % Los mafiosos que resuelven problemas tienen un nivel de 10 de respeto, los matones 1 y los capos 20.
 % Al resto no se les debe ningún nivel de respeto. 
 personajesRespetables(Personajes):-
-    findall(Personaje, (nivelDeRespeto(Personaje, Nivel), Nivel > 9), Personajes).
+    findall(Personaje, esRespetable(Personaje), Personajes).
 
-nivelDeRespeto(Alguien, Nivel):-
-    personaje(Alguien, actriz(Peliculas)),
+esRespetable(Personaje):-
+    personaje(Personaje, Trabajo),
+    nivelDeRespeto(Trabajo, Nivel),
+    Nivel > 9.
+
+nivelDeRespeto(actriz(Peliculas), Nivel):-
     length(Peliculas, Cantidad),
     Nivel is (Cantidad / 10).
-nivelDeRespeto(Alguien, 10):-
-    personaje(Alguien, mafioso(resuelveProblemas)).
-nivelDeRespeto(Alguien, 1):-
-    personaje(Alguien, mafioso(maton)).
-nivelDeRespeto(Alguien, 20):-
-    personaje(Alguien, mafioso(capo)).
+nivelDeRespeto(mafioso(resuelveProblemas), 10).
+nivelDeRespeto(mafioso(maton), 1).
+nivelDeRespeto(mafioso(capo), 20).
+
+% nivelDeRespeto(Alguien, Nivel):-
+%     personaje(Alguien, actriz(Peliculas)),
+%     length(Peliculas, Cantidad),
+%     Nivel is (Cantidad / 10).
+% nivelDeRespeto(Alguien, 10):-
+%     personaje(Alguien, mafioso(resuelveProblemas)).
+% nivelDeRespeto(Alguien, 1):-
+%     personaje(Alguien, mafioso(maton)).
+% nivelDeRespeto(Alguien, 20):-
+%     personaje(Alguien, mafioso(capo)).
 
 % Punto 7
 % hartoDe/2: un personaje está harto de otro, cuando todas las tareas asignadas al primero requieren interactuar con el segundo (cuidar, buscar o ayudar) 
