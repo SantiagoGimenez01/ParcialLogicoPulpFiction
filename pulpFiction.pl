@@ -22,6 +22,14 @@ trabajaPara(marsellus, winston).
 % esPeligroso/1. Nos dice si un personaje es peligroso. Eso ocurre cuando:
 % realiza alguna actividad peligrosa: ser matón, o robar licorerías. 
 % tiene empleados peligrosos
+esPeligroso(Personaje):-
+    personaje(Personaje, mafioso(maton)).
+esPeligroso(Personaje):-
+    personaje(Personaje, ladron(Robos)),
+    member(licorerias, Robos).
+esPeligroso(Personaje):-
+    trabajaPara(Personaje, Empleado),
+    esPeligroso(Empleado).
 
 % Punto 2
 % duoTemible/2 que relaciona dos personajes cuando son peligrosos y además son pareja o amigos. 
@@ -29,6 +37,15 @@ trabajaPara(marsellus, winston).
 amigo(vincent, jules).
 amigo(jules, jimmie).
 amigo(vincent, elVendedor).
+
+duoTemible(Uno, Otro):-
+    esPeligroso(Uno),
+    esPeligroso(Otro),
+    pareja(Uno, Otro).
+duoTemible(Uno, Otro):-
+    esPeligroso(Uno),
+    esPeligroso(Otro),
+    amigo(Uno, Otro).
 
 % Punto 3
 % estaEnProblemas/1: un personaje está en problemas cuando el jefe es peligroso y le encarga que cuide a su pareja o bien, tiene que ir a buscar a un boxeador. 
@@ -46,6 +63,15 @@ encargo(vincent,  elVendedor, cuidar(mia)).
 encargo(marsellus, winston, ayudar(jules)).
 encargo(marsellus, winston, ayudar(vincent)).
 encargo(marsellus, vincent, buscar(butch, losAngeles)).
+
+estaEnProblemas(butch).
+estaEnProblemas(Personaje):-
+    trabajaPara(Jefe, Personaje),
+    pareja(Jefe, Pareja),
+    encargo(Jefe, Personaje, cuidar(Pareja)).
+estaEnProblemas(Personaje):-
+    encargo(_, Personaje, cuidar(Boxeador, _)),
+    personaje(Boxeador, boxeador).
 
 % Punto 4
 % sanCayetano/1:  es quien a todos los que tiene cerca les da trabajo (algún encargo). 
@@ -69,7 +95,6 @@ encargo(marsellus, vincent, buscar(butch, losAngeles)).
 
 % Punto 8:
 % Ah, algo más: nuestros personajes tienen características. Lo cual es bueno, porque nos ayuda a diferenciarlos cuando están de a dos. Por ejemplo:
-
 caracteristicas(vincent,  [negro, muchoPelo, tieneCabeza]).
 caracteristicas(jules,    [tieneCabeza, muchoPelo]).
 caracteristicas(marvin,   [negro]).
