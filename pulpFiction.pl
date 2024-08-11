@@ -62,6 +62,7 @@ encargo(marsellus, vincent,   cuidar(mia)).
 encargo(vincent,  elVendedor, cuidar(mia)).
 encargo(marsellus, winston, ayudar(jules)).
 encargo(marsellus, winston, ayudar(vincent)).
+encargo(marsellus, winston, ayudar(mia)).
 encargo(marsellus, vincent, buscar(butch, losAngeles)).
 
 estaEnProblemas(butch).
@@ -76,9 +77,26 @@ estaEnProblemas(Personaje):-
 % Punto 4
 % sanCayetano/1:  es quien a todos los que tiene cerca les da trabajo (algún encargo). 
 % Alguien tiene cerca a otro personaje si es su amigo o empleado. 
+sanCayetano(Alguien):-
+    personaje(Alguien, _),
+    forall(tieneCerca(Alguien, Otros), encargo(Alguien, Otros, _)).
+
+tieneCerca(Alguien, Otro):-
+    amigo(Alguien, Otro).
+tieneCerca(Alguien, Otro):-
+    trabajaPara(Alguien, Otro).
 
 % Punto 5
 % masAtareado/1. Es el más atareado aquel que tenga más encargos que cualquier otro personaje.
+masAtareado(Alguien):-
+    personaje(Alguien, _),
+    not((personaje(OtroPersonaje, _), cantidadDeEncargos(Otro, CantidadOtro), cantidadDeEncargos(Alguien, Cantidad), CantidadOtro > Cantidad)).
+
+cantidadDeEncargos(Personaje, Cantidad):-
+    personaje(Personaje, _),
+    findall(Encargo, encargo(_, Personaje, Encargo), Encargos),
+    length(Encargos, Cantidad).
+    
 
 % Punto 6
 % personajesRespetables/1: genera la lista de todos los personajes respetables. Es respetable cuando su actividad tiene un nivel de respeto mayor a 9.
@@ -86,6 +104,19 @@ estaEnProblemas(Personaje):-
 % Las actrices tienen un nivel de respeto de la décima parte de su cantidad de peliculas.
 % Los mafiosos que resuelven problemas tienen un nivel de 10 de respeto, los matones 1 y los capos 20.
 % Al resto no se les debe ningún nivel de respeto. 
+personajesRespetables(Personajes):-
+    findall(Personaje, (nivelDeRespeto(Personaje, Nivel), Nivel > 9), Personajes).
+
+nivelDeRespeto(Alguien, Nivel):-
+    personaje(Alguien, actriz(Peliculas)),
+    length(Peliculas, Cantidad),
+    Nivel is (Cantidad / 10).
+nivelDeRespeto(Alguien, 10):-
+    personaje(Alguien, mafioso(resuelveProblemas)).
+nivelDeRespeto(Alguien, 1):-
+    personaje(Alguien, mafioso(maton)).
+nivelDeRespeto(Alguien, 20):-
+    personaje(Alguien, mafioso(capo)).
 
 % Punto 7
 % hartoDe/2: un personaje está harto de otro, cuando todas las tareas asignadas al primero requieren interactuar con el segundo (cuidar, buscar o ayudar) 
