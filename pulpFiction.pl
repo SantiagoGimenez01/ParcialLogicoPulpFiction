@@ -62,7 +62,7 @@ encargo(marsellus, vincent,   cuidar(mia)).
 encargo(vincent,  elVendedor, cuidar(mia)).
 encargo(marsellus, winston, ayudar(jules)).
 encargo(marsellus, winston, ayudar(vincent)).
-encargo(marsellus, winston, ayudar(mia)).
+encargo(marsellus, winston, cuidar(jules)).
 encargo(marsellus, vincent, buscar(butch, losAngeles)).
 
 estaEnProblemas(butch).
@@ -123,6 +123,20 @@ nivelDeRespeto(Alguien, 20):-
 % o un amigo del segundo. Ejemplo:
 % ? hartoDe(winston, vincent).
 % true % winston tiene que ayudar a vincent, y a jules, que es amigo de vincent.
+hartoDe(Uno, Otro):-
+    personaje(Uno, _),
+    personaje(Otro, _),
+    forall(encargo(_, Uno, Tarea), condicionHarto(Tarea, Otro)).
+
+condicionHarto(cuidar(Alguien), Alguien).
+condicionHarto(cuidar(AmigoAlguien), Alguien):-
+    amigo(Alguien, AmigoAlguien).
+condicionHarto(ayudar(Alguien), Alguien).
+condicionHarto(ayudar(AmigoAlguien), Alguien):-
+    amigo(Alguien, AmigoAlguien).
+condicionHarto(buscar(Alguien, _), Alguien).
+condicionHarto(buscar(AmigoAlguien, _), Alguien):-
+    amigo(Alguien, AmigoAlguien).
 
 % Punto 8:
 % Ah, algo más: nuestros personajes tienen características. Lo cual es bueno, porque nos ayuda a diferenciarlos cuando están de a dos. Por ejemplo:
@@ -131,8 +145,20 @@ caracteristicas(jules,    [tieneCabeza, muchoPelo]).
 caracteristicas(marvin,   [negro]).
 
 % Desarrollar duoDiferenciable/2, que relaciona a un dúo (dos amigos o una pareja) en el que uno tiene al menos una característica que el otro no
+duoDiferenciable(Uno, Otro):-
+    sonDuo(Uno, Otro),
+    tienenAlgoDiferente(Uno, Otro).
 
+tienenAlgoDiferente(Uno, Otro):-
+    caracteristicas(Uno, CaracteristicasUno),
+    caracteristicas(Otro, CaracteristicasOtro),
+    member(Diferencia, CaracteristicasUno),
+    not(member(Diferencia, CaracteristicasOtro)).
 
+sonDuo(Uno, Otro):-
+    amigo(Uno, Otro).
+sonDuo(Uno, Otro):-
+    pareja(Uno, Otro).
 
 
 
